@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VinylPrice — Compare Record Prices Everywhere</title>
+  <meta name="description" content="Search Amazon, eBay, Discogs, Target, Walmart and more at once. Find the best price on any vinyl record instantly." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
@@ -12,79 +13,130 @@
     html { scroll-behavior: smooth; }
     body {
       font-family: 'Inter', system-ui, sans-serif;
-      background: #0f0f0f;
-      color: #f0f0f0;
+      background: #f8f7f5;
+      color: #1a1a1a;
       min-height: 100vh;
     }
 
-    /* ── Header ── */
-    header {
-      background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
-      border-bottom: 1px solid #2a2a2a;
-      padding: 28px 24px 32px;
-      text-align: center;
-    }
-    .logo {
-      display: inline-flex;
+    /* ── Top Nav ── */
+    nav {
+      background: #fff;
+      border-bottom: 1px solid #eee;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       text-decoration: none;
     }
-    .logo-icon {
-      width: 48px; height: 48px;
+    .nav-logo-icon {
+      width: 32px; height: 32px;
       background: #e63946;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       position: relative;
-      box-shadow: 0 0 0 3px #c62828, 0 0 0 10px rgba(230,57,70,0.15);
       flex-shrink: 0;
     }
-    .logo-icon::after {
+    .nav-logo-icon::after {
       content: '';
-      width: 12px; height: 12px;
-      background: #0f0f0f;
+      width: 8px; height: 8px;
+      background: #fff;
       border-radius: 50%;
       position: absolute;
     }
-    .logo-inner-ring {
-      width: 32px; height: 32px;
-      border: 2px solid rgba(255,255,255,0.15);
+    .nav-logo-ring {
+      width: 22px; height: 22px;
+      border: 1.5px solid rgba(255,255,255,0.4);
       border-radius: 50%;
       position: absolute;
     }
-    .logo-text h1 {
-      font-size: 28px;
+    .nav-logo-text {
+      font-size: 18px;
       font-weight: 800;
-      letter-spacing: -0.5px;
-      color: #fff;
-      text-align: left;
+      color: #1a1a1a;
+      letter-spacing: -0.3px;
     }
-    .logo-text h1 span { color: #e63946; }
-    .logo-text p {
-      font-size: 13px;
-      color: #888;
-      text-align: left;
-      margin-top: 2px;
+    .nav-logo-text span { color: #e63946; }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .nav-links a {
+      font-size: 14px;
+      color: #666;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .nav-links a:hover { color: #1a1a1a; }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(160deg, #fff 0%, #f8f7f5 60%);
+      border-bottom: 1px solid #eee;
+      padding: 52px 24px 44px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff5f5;
+      border: 1px solid #fdd;
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #e63946;
+      letter-spacing: 0.3px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 46px);
+      font-weight: 800;
+      color: #1a1a1a;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 14px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: #e63946;
+    }
+    .hero-sub {
+      font-size: 17px;
+      color: #666;
+      max-width: 520px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
     }
 
     /* ── Search Bar ── */
-    .search-section {
-      padding: 36px 24px 20px;
-      max-width: 720px;
+    .search-wrap {
+      max-width: 640px;
       margin: 0 auto;
     }
     .search-form {
       display: flex;
-      gap: 10px;
-      background: #1e1e1e;
-      border: 1.5px solid #333;
-      border-radius: 16px;
-      padding: 6px 6px 6px 20px;
-      transition: border-color 0.2s;
+      gap: 0;
+      background: #fff;
+      border: 2px solid #e0e0e0;
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
     .search-form:focus-within {
       border-color: #e63946;
-      box-shadow: 0 0 0 4px rgba(230,57,70,0.12);
+      box-shadow: 0 0 0 4px rgba(230,57,70,0.1);
     }
     .search-input {
       flex: 1;
@@ -92,16 +144,16 @@
       border: none;
       outline: none;
       font-size: 16px;
-      color: #f0f0f0;
+      color: #1a1a1a;
       font-family: inherit;
+      padding: 16px 20px;
     }
-    .search-input::placeholder { color: #555; }
+    .search-input::placeholder { color: #aaa; }
     .search-btn {
       background: #e63946;
       color: white;
       border: none;
-      border-radius: 11px;
-      padding: 12px 24px;
+      padding: 0 28px;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
@@ -109,35 +161,58 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      transition: background 0.2s, transform 0.1s;
+      transition: background 0.2s;
       white-space: nowrap;
+      min-height: 56px;
     }
     .search-btn:hover  { background: #c62828; }
-    .search-btn:active { transform: scale(0.97); }
+    .search-btn:active { filter: brightness(0.9); }
     .search-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .search-hint {
-      font-size: 13px;
-      color: #555;
-      margin-top: 10px;
-      text-align: center;
-    }
-    .search-hint b { color: #888; font-weight: 500; }
 
-    /* ── Source Badges ── */
-    .sources-row {
+    /* ── Popular searches ── */
+    .popular-row {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       justify-content: center;
-      padding: 0 24px 28px;
-      max-width: 720px;
-      margin: 0 auto;
+      margin-top: 18px;
     }
-    .source-chip {
-      background: #1e1e1e;
-      border: 1px solid #2a2a2a;
+    .popular-label {
+      font-size: 13px;
+      color: #aaa;
+      align-self: center;
+      font-weight: 500;
+    }
+    .popular-chip {
+      background: #fff;
+      border: 1px solid #ddd;
       border-radius: 20px;
-      padding: 5px 12px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: #555;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      font-family: inherit;
+    }
+    .popular-chip:hover {
+      border-color: #e63946;
+      color: #e63946;
+      background: #fff5f5;
+    }
+
+    /* ── Retailer badges ── */
+    .retailer-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      padding: 20px 24px 0;
+    }
+    .retailer-pill {
+      background: #f2f2f2;
+      border-radius: 20px;
+      padding: 5px 13px;
       font-size: 12px;
       color: #777;
       font-weight: 500;
@@ -145,37 +220,38 @@
 
     /* ── Main Content ── */
     main {
-      max-width: 1100px;
+      max-width: 1140px;
       margin: 0 auto;
-      padding: 0 20px 60px;
+      padding: 32px 20px 80px;
     }
 
     /* ── Status / Loading ── */
     #status {
       text-align: center;
-      padding: 48px 24px;
+      padding: 60px 24px;
       display: none;
     }
     .spinner {
       width: 44px; height: 44px;
-      border: 3px solid #2a2a2a;
+      border: 3px solid #eee;
       border-top-color: #e63946;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       margin: 0 auto 16px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    #status p { color: #777; font-size: 15px; }
+    #status p { color: #999; font-size: 15px; }
 
     /* ── Error ── */
     #error-box {
-      background: #1e1212;
-      border: 1px solid #5c1b1b;
+      background: #fff5f5;
+      border: 1px solid #fcc;
       border-radius: 12px;
-      padding: 20px 24px;
-      color: #f88;
+      padding: 18px 22px;
+      color: #c0392b;
       display: none;
       margin-bottom: 24px;
+      font-size: 14px;
     }
 
     /* ── Results Header ── */
@@ -186,37 +262,41 @@
       margin-bottom: 20px;
       flex-wrap: wrap;
       gap: 12px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #eee;
     }
     #results-header h2 {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
-      color: #ccc;
+      color: #666;
     }
-    #results-header h2 span { color: #fff; }
+    #results-header h2 span { color: #1a1a1a; }
     .sort-row { display: flex; align-items: center; gap: 8px; }
-    .sort-label { font-size: 13px; color: #666; }
+    .sort-label { font-size: 13px; color: #999; }
     .sort-select {
-      background: #1e1e1e;
-      border: 1px solid #333;
+      background: #fff;
+      border: 1px solid #ddd;
       border-radius: 8px;
-      color: #ccc;
+      color: #444;
       font-size: 13px;
-      padding: 6px 10px;
+      padding: 7px 12px;
       cursor: pointer;
       font-family: inherit;
+      outline: none;
     }
+    .sort-select:focus { border-color: #e63946; }
 
     /* ── Results Grid ── */
     #results-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 16px;
     }
 
     /* ── Card ── */
     .card {
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
+      background: #fff;
+      border: 1px solid #eee;
       border-radius: 16px;
       overflow: hidden;
       display: flex;
@@ -225,24 +305,25 @@
       position: relative;
     }
     .card:hover {
-      border-color: #444;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      border-color: #ddd;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.09);
     }
     .card.best-price {
-      border-color: #2d6a2f;
-      background: linear-gradient(180deg, #1a2a1a 0%, #1a1a1a 100%);
+      border-color: #c6f0c6;
+      outline: 2px solid #27ae60;
+      outline-offset: -2px;
     }
 
     /* Badge */
     .card-badge {
       position: absolute;
       top: 12px; left: 12px;
-      background: #2d6a2f;
-      color: #7fff7f;
-      font-size: 11px;
+      background: #27ae60;
+      color: #fff;
+      font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
       text-transform: uppercase;
       padding: 4px 10px;
       border-radius: 20px;
@@ -252,7 +333,7 @@
     .card-image {
       width: 100%;
       aspect-ratio: 1;
-      background: #111;
+      background: #f5f5f5;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -264,41 +345,41 @@
       object-fit: cover;
     }
     .card-image .no-img {
-      width: 80px; height: 80px;
-      opacity: 0.12;
+      width: 64px; height: 64px;
+      opacity: 0.2;
     }
 
     /* Card body */
     .card-body {
-      padding: 16px;
+      padding: 14px 16px 10px;
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 7px;
     }
 
     .retailer-row {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
     }
     .retailer-dot {
-      width: 8px; height: 8px;
+      width: 7px; height: 7px;
       border-radius: 50%;
       flex-shrink: 0;
     }
     .retailer-name {
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.6px;
-      color: #888;
+      letter-spacing: 0.7px;
+      color: #aaa;
     }
 
     .card-title {
       font-size: 14px;
-      font-weight: 500;
-      color: #ddd;
+      font-weight: 600;
+      color: #1a1a1a;
       line-height: 1.4;
       display: -webkit-box;
       -webkit-line-clamp: 3;
@@ -309,15 +390,16 @@
     .card-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: 5px;
       margin-top: 2px;
     }
     .meta-chip {
-      background: #252525;
+      background: #f5f5f5;
       border-radius: 6px;
       padding: 3px 8px;
       font-size: 11px;
-      color: #666;
+      color: #888;
+      font-weight: 500;
     }
 
     .card-footer {
@@ -327,26 +409,28 @@
       justify-content: space-between;
       gap: 10px;
       margin-top: auto;
+      border-top: 1px solid #f5f5f5;
+      padding-top: 12px;
     }
     .price {
       font-size: 22px;
       font-weight: 800;
-      color: #fff;
+      color: #1a1a1a;
       letter-spacing: -0.5px;
     }
     .price.no-price {
       font-size: 14px;
-      color: #666;
+      color: #aaa;
       font-weight: 500;
     }
-    .card.best-price .price { color: #7fff7f; }
+    .card.best-price .price { color: #27ae60; }
 
     .buy-btn {
-      background: #e63946;
+      background: #1a1a1a;
       color: white;
       text-decoration: none;
       border-radius: 10px;
-      padding: 10px 18px;
+      padding: 10px 16px;
       font-size: 13px;
       font-weight: 600;
       font-family: inherit;
@@ -354,86 +438,152 @@
       transition: background 0.2s, transform 0.1s;
       white-space: nowrap;
     }
-    .buy-btn:hover  { background: #c62828; }
+    .buy-btn:hover  { background: #333; }
     .buy-btn:active { transform: scale(0.97); }
+    .card.best-price .buy-btn {
+      background: #27ae60;
+    }
+    .card.best-price .buy-btn:hover { background: #219150; }
 
     .rating {
       font-size: 12px;
-      color: #f5a623;
+      color: #f0a500;
     }
 
     /* ── Empty state ── */
     #empty-state {
       display: none;
       text-align: center;
-      padding: 60px 24px;
-      color: #555;
+      padding: 80px 24px;
+      color: #bbb;
     }
-    #empty-state svg { opacity: 0.2; margin-bottom: 20px; }
-    #empty-state h3 { font-size: 20px; color: #666; margin-bottom: 8px; }
-    #empty-state p { font-size: 14px; }
+    #empty-state svg { opacity: 0.25; margin-bottom: 20px; }
+    #empty-state h3 { font-size: 20px; color: #888; margin-bottom: 8px; }
+    #empty-state p { font-size: 14px; color: #aaa; }
+
+    /* ── Feature strip (shows before first search) ── */
+    #feature-strip {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 36px 24px 8px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .feature-card {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 14px;
+      padding: 22px 24px;
+      text-align: center;
+      flex: 1;
+      min-width: 180px;
+      max-width: 240px;
+    }
+    .feature-icon {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    .feature-card h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 5px;
+    }
+    .feature-card p {
+      font-size: 13px;
+      color: #888;
+      line-height: 1.5;
+    }
 
     /* ── Footer ── */
     footer {
       text-align: center;
-      padding: 32px 24px;
-      border-top: 1px solid #1e1e1e;
-      color: #444;
+      padding: 28px 24px;
+      border-top: 1px solid #eee;
+      background: #fff;
+      color: #bbb;
       font-size: 12px;
-      line-height: 1.8;
+      line-height: 1.9;
     }
-    footer a { color: #666; }
+    footer a { color: #aaa; text-decoration: none; }
+    footer a:hover { color: #666; }
 
     /* ── Responsive ── */
     @media (max-width: 600px) {
-      .logo-text h1 { font-size: 22px; }
+      .nav-links { display: none; }
+      .hero h1 { font-size: 26px; }
+      .hero-sub { font-size: 15px; }
       .search-btn span { display: none; }
       #results-grid { grid-template-columns: 1fr; }
+      #feature-strip { flex-direction: column; align-items: center; }
+      .feature-card { max-width: 100%; }
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <a class="logo" href="/">
-      <div class="logo-icon">
-        <div class="logo-inner-ring"></div>
+  <!-- Nav -->
+  <nav>
+    <a class="nav-logo" href="/">
+      <div class="nav-logo-icon">
+        <div class="nav-logo-ring"></div>
       </div>
-      <div class="logo-text">
-        <h1>Vinyl<span>Price</span></h1>
-        <p>Compare record prices across the web — instantly</p>
-      </div>
+      <span class="nav-logo-text">Vinyl<span>Price</span></span>
     </a>
-  </header>
+    <div class="nav-links">
+      <a href="https://www.discogs.com" target="_blank" rel="noopener">Browse Discogs</a>
+      <a href="https://www.amazon.com/s?k=vinyl+records" target="_blank" rel="noopener">Amazon Vinyl</a>
+    </div>
+  </nav>
 
-  <div class="search-section">
-    <form class="search-form" id="search-form">
-      <input
-        class="search-input"
-        id="search-input"
-        type="text"
-        placeholder='Try "Dark Side of the Moon" or "Kind of Blue"…'
-        autocomplete="off"
-        spellcheck="false"
-      />
-      <button class="search-btn" type="submit" id="search-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <span>Search</span>
-      </button>
-    </form>
-    <p class="search-hint">Search by <b>album name</b>, <b>artist</b>, or <b>catalog number</b></p>
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-eyebrow">
+      🎵 Free Price Comparison
+    </div>
+    <h1>Find the <em>best price</em><br>on any vinyl record</h1>
+    <p class="hero-sub">We search Amazon, eBay, Discogs, Target, Walmart and more at once — so you don't have to.</p>
+
+    <div class="search-wrap">
+      <form class="search-form" id="search-form">
+        <input
+          class="search-input"
+          id="search-input"
+          type="text"
+          placeholder='Search by album, artist, or catalog number…'
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button class="search-btn" type="submit" id="search-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>Compare Prices</span>
+        </button>
+      </form>
+
+      <div class="popular-row">
+        <span class="popular-label">Popular:</span>
+        <button class="popular-chip" onclick="quickSearch('Dark Side of the Moon')">Dark Side of the Moon</button>
+        <button class="popular-chip" onclick="quickSearch('Kind of Blue')">Kind of Blue</button>
+        <button class="popular-chip" onclick="quickSearch('Rumours Fleetwood Mac')">Rumours</button>
+        <button class="popular-chip" onclick="quickSearch('Thriller Michael Jackson')">Thriller</button>
+        <button class="popular-chip" onclick="quickSearch('Abbey Road Beatles')">Abbey Road</button>
+      </div>
+    </div>
+
+    <div class="retailer-strip">
+      <span class="retailer-pill">🛒 Amazon</span>
+      <span class="retailer-pill">🛍️ eBay</span>
+      <span class="retailer-pill">🎵 Discogs</span>
+      <span class="retailer-pill">🎯 Target</span>
+      <span class="retailer-pill">🟡 Walmart</span>
+      <span class="retailer-pill">🔵 Best Buy</span>
+      <span class="retailer-pill">+ more</span>
+    </div>
   </div>
 
-  <div class="sources-row">
-    <span class="source-chip">🛒 Amazon</span>
-    <span class="source-chip">🛍️ eBay</span>
-    <span class="source-chip">🎯 Target</span>
-    <span class="source-chip">🟡 Walmart</span>
-    <span class="source-chip">🎵 Discogs</span>
-    <span class="source-chip">🛒 Best Buy</span>
-    <span class="source-chip">+ more</span>
-  </div>
-
+  <!-- Main -->
   <main>
     <div id="error-box"></div>
 
@@ -445,11 +595,11 @@
     <div id="results-header">
       <h2>Results for "<span id="query-display"></span>"</h2>
       <div class="sort-row">
-        <span class="sort-label">Sort by</span>
+        <span class="sort-label">Sort:</span>
         <select class="sort-select" id="sort-select">
           <option value="price-asc">Price: Low to High</option>
           <option value="price-desc">Price: High to Low</option>
-          <option value="source">Retailer</option>
+          <option value="source">By Retailer</option>
         </select>
       </div>
     </div>
@@ -457,17 +607,48 @@
     <div id="results-grid"></div>
 
     <div id="empty-state">
-      <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+      <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
       <h3>No results found</h3>
-      <p>Try a different search — maybe just the album name or the artist.</p>
+      <p>Try searching just the album name, or the artist's name.</p>
+    </div>
+
+    <!-- Feature cards (shown before any search) -->
+    <div id="feature-strip">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Instant Comparison</h3>
+        <p>We check multiple stores at once and show you every listing side by side.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💰</div>
+        <h3>Best Price Badge</h3>
+        <p>The lowest price is always highlighted so you know exactly where to buy.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎵</div>
+        <h3>New & Used</h3>
+        <p>See prices from Discogs marketplace alongside new retail listings.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🆓</div>
+        <h3>Always Free</h3>
+        <p>No account needed. Just search and find your record.</p>
+      </div>
     </div>
   </main>
 
   <footer>
-    <p>VinylPrice searches across multiple retailers to help you find the best deal.</p>
-    <p style="margin-top:6px">Some links may be affiliate links — we may earn a small commission at no extra cost to you.</p>
+    <p><strong style="color:#888">VinylPrice</strong> — Instant record price comparison across the web</p>
+    <p style="margin-top:4px">Some links are affiliate links. We may earn a small commission if you buy — at no extra cost to you.</p>
+    <p style="margin-top:6px"><a href="https://www.discogs.com" target="_blank">Discogs</a> · <a href="https://serpapi.com" target="_blank">Powered by SerpAPI</a></p>
   </footer>
 
   <script src="app.js"></script>
+  <script>
+    function quickSearch(term) {
+      document.getElementById('search-input').value = term;
+      document.getElementById('search-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    }
+  </script>
 </body>
 </html>

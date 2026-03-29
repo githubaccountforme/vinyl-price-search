@@ -11,6 +11,7 @@ const grid        = document.getElementById('results-grid');
 const emptyState  = document.getElementById('empty-state');
 const queryLabel  = document.getElementById('query-display');
 const sortSelect  = document.getElementById('sort-select');
+const featureStrip = document.getElementById('feature-strip');
 
 let currentResults = [];
 
@@ -143,6 +144,7 @@ async function doSearch(query) {
   emptyState.style.display = 'none';
   header.style.display = 'none';
   grid.innerHTML = '';
+  if (featureStrip) featureStrip.style.display = 'none';
   statusEl.style.display = 'block';
   statusText.textContent = 'Searching across retailers…';
   searchBtn.disabled = true;
