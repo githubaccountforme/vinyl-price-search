@@ -280,13 +280,16 @@ app.post('/api/watchlist', async (req, res) => {
   try {
     const { id, token } = db.addWatch({ email, query, itemTitle, alertBelow, lastPrice });
 
-    // Send confirmation email
+    // Respond immediately — don't block on email sending
+    res.json({ ok: true, id });
+
+    // Send confirmation email in the background (non-blocking)
     const transporter = getTransporter();
     if (transporter) {
       const siteUrl = process.env.SITE_URL || 'https://vinyl-price-search.onrender.com';
       const unsubUrl = `${siteUrl}/unsubscribe?token=${token}`;
       const fromAddr = process.env.EMAIL_FROM || process.env.EMAIL_USER;
-      await transporter.sendMail({
+      transporter.sendMail({
         from:    `"VinylPrice Alerts" <${fromAddr}>`,
         to:      email,
         subject: `✅ Price alert set for "${itemTitle}"`,
@@ -305,10 +308,8 @@ app.post('/api/watchlist', async (req, res) => {
             </p>
           </div>
         `,
-      });
+      }).catch(err => console.error('[email] Confirmation send failed:', err.message));
     }
-
-    res.json({ ok: true, id });
   } catch (err) {
     console.error('Watchlist error:', err.message);
     res.status(500).json({ error: 'Failed to save alert. Please try again.' });
