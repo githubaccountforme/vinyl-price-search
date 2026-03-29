@@ -3,8 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VinylPrice — Compare Record Prices Everywhere</title>
-  <meta name="description" content="Search Amazon, eBay, Discogs, Target, Walmart and more at once. Find the best price on any vinyl record instantly." />
+  <title>VinylPrice — Compare Vinyl Record Prices Across Every Store</title>
+  <meta name="description" content="Find the best price on any vinyl record instantly. VinylPrice searches Amazon, eBay, Discogs, Target, Walmart and more — all in one place." />
+  <meta name="keywords" content="vinyl record price comparison, best vinyl record deals, buy vinyl records cheap, vinyl LP prices, discogs price, amazon vinyl records" />
+  <link rel="canonical" href="https://vinylpricesearch.com/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://vinylpricesearch.com/" />
+  <meta property="og:title" content="VinylPrice — Compare Vinyl Record Prices Everywhere" />
+  <meta property="og:description" content="Find the best price on any vinyl record instantly. Searches Amazon, eBay, Discogs, Target, Walmart and more." />
+  <meta property="og:image" content="https://vinylpricesearch.com/og-image.png" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="VinylPrice — Compare Vinyl Record Prices Everywhere" />
+  <meta name="twitter:description" content="Find the best price on any vinyl record instantly across Amazon, eBay, Discogs, and more." />
+
+  <!-- JSON-LD: WebSite with SearchAction (enables Google Sitelinks Search Box) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "VinylPrice",
+    "url": "https://vinylpricesearch.com/",
+    "description": "Compare vinyl record prices across Amazon, eBay, Discogs, Target, Walmart and more.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://vinylpricesearch.com/?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
@@ -671,8 +704,8 @@
       <span class="nav-logo-text">Vinyl<span>Price</span></span>
     </a>
     <div class="nav-links">
+      <a href="/popular.html">Popular Albums</a>
       <a href="https://www.discogs.com" target="_blank" rel="noopener">Browse Discogs</a>
-      <a href="https://www.amazon.com/s?k=vinyl+records" target="_blank" rel="noopener">Amazon Vinyl</a>
     </div>
   </nav>
 

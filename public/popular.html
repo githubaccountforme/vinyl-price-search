@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Best Vinyl Record Prices — Most Popular Albums | VinylPrice</title>
+  <meta name="description" content="Compare prices on the most popular vinyl records — Dark Side of the Moon, Kind of Blue, Rumours, Abbey Road, Thriller and more. Find the best deals across Amazon, eBay, Discogs and more." />
+  <link rel="canonical" href="https://vinylpricesearch.com/popular" />
+  <meta property="og:title" content="Best Vinyl Record Prices — Most Popular Albums" />
+  <meta property="og:description" content="Compare prices on classic vinyl records across Amazon, eBay, Discogs, Target, Walmart and more." />
+  <meta property="og:url" content="https://vinylpricesearch.com/popular" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f8f7f5; color: #1a1a1a; }
+
+    nav {
+      background: #fff; border-bottom: 1px solid #eee;
+      padding: 0 24px; height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-icon {
+      width: 32px; height: 32px; background: #e63946; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0;
+    }
+    .nav-logo-icon::after {
+      content: ''; width: 8px; height: 8px; background: #fff;
+      border-radius: 50%; position: absolute;
+    }
+    .nav-logo-text { font-size: 18px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.3px; }
+    .nav-logo-text span { color: #e63946; }
+    .nav-links { display: flex; align-items: center; gap: 20px; }
+    .nav-links a { font-size: 14px; color: #666; text-decoration: none; font-weight: 500; }
+    .nav-links a:hover { color: #1a1a1a; }
+    .nav-links a.active { color: #e63946; font-weight: 600; }
+
+    .page-hero {
+      background: #fff; border-bottom: 1px solid #eee;
+      padding: 40px 24px 32px; text-align: center;
+    }
+    .page-hero h1 { font-size: clamp(22px, 4vw, 36px); font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; margin-bottom: 10px; }
+    .page-hero p { font-size: 16px; color: #666; max-width: 520px; margin: 0 auto; }
+
+    .quick-search-bar {
+      max-width: 560px; margin: 24px auto 0;
+      display: flex; background: #fff; border: 2px solid #e0e0e0;
+      border-radius: 12px; overflow: hidden; transition: border-color 0.2s;
+    }
+    .quick-search-bar:focus-within { border-color: #e63946; }
+    .quick-search-bar input {
+      flex: 1; border: none; outline: none; font-size: 15px;
+      color: #1a1a1a; font-family: inherit; padding: 13px 18px; background: transparent;
+    }
+    .quick-search-bar input::placeholder { color: #aaa; }
+    .quick-search-bar button {
+      background: #e63946; color: #fff; border: none; padding: 0 22px;
+      font-weight: 600; font-size: 14px; cursor: pointer; font-family: inherit; transition: background 0.2s;
+    }
+    .quick-search-bar button:hover { background: #c62828; }
+
+    main { max-width: 1140px; margin: 0 auto; padding: 36px 20px 80px; }
+
+    .section-head {
+      display: flex; align-items: baseline; gap: 12px;
+      margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #eee;
+    }
+    .section-head h2 { font-size: 18px; font-weight: 800; color: #1a1a1a; }
+    .section-head span { font-size: 13px; color: #aaa; }
+
+    .album-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .album-card {
+      background: #fff; border: 1px solid #eee; border-radius: 14px;
+      overflow: hidden; cursor: pointer; text-decoration: none; color: inherit;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      display: flex; flex-direction: column;
+    }
+    .album-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 32px rgba(0,0,0,0.09);
+      border-color: #ddd;
+    }
+    .album-art {
+      width: 100%; aspect-ratio: 1; background: #f0f0f0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 48px; position: relative; overflow: hidden;
+    }
+    .album-art img { width: 100%; height: 100%; object-fit: cover; }
+    .album-info { padding: 13px 14px 14px; }
+    .album-artist { font-size: 11px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 3px; }
+    .album-title { font-size: 14px; font-weight: 700; color: #1a1a1a; line-height: 1.3; margin-bottom: 8px; }
+    .album-cta {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 13px; font-weight: 600; color: #e63946;
+    }
+
+    footer {
+      text-align: center; padding: 28px 24px;
+      border-top: 1px solid #eee; background: #fff;
+      color: #bbb; font-size: 12px; line-height: 1.9;
+    }
+    footer a { color: #aaa; text-decoration: none; }
+
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .album-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">
+    <div class="nav-logo-icon"></div>
+    <span class="nav-logo-text">Vinyl<span>Price</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="/popular.html" class="active">Popular Albums</a>
+    <a href="/">Search All Records</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <h1>Popular Vinyl Records — Best Prices</h1>
+  <p>Click any album to instantly compare prices across Amazon, eBay, Discogs, Target, Walmart and more.</p>
+  <form class="quick-search-bar" onsubmit="handleSearch(event)">
+    <input id="hero-search" type="text" placeholder="Search any album or artist…" autocomplete="off" />
+    <button type="submit">Search</button>
+  </form>
+</div>
+
+<main>
+
+  <div class="section-head">
+    <h2>🏆 All-Time Classics</h2>
+    <span>Click to compare prices</span>
+  </div>
+  <div class="album-grid" id="classics-grid"></div>
+
+  <div class="section-head">
+    <h2>🎸 Rock &amp; Alternative</h2>
+  </div>
+  <div class="album-grid" id="rock-grid"></div>
+
+  <div class="section-head">
+    <h2>🎷 Jazz &amp; Soul</h2>
+  </div>
+  <div class="album-grid" id="jazz-grid"></div>
+
+  <div class="section-head">
+    <h2>🎤 Hip-Hop &amp; R&amp;B</h2>
+  </div>
+  <div class="album-grid" id="hiphop-grid"></div>
+
+</main>
+
+<footer>
+  <p><strong style="color:#888">VinylPrice</strong> — Instant record price comparison across the web</p>
+  <p style="margin-top:4px">Some links are affiliate links. We may earn a small commission if you buy — at no extra cost to you.</p>
+  <p style="margin-top:6px"><a href="/">← Back to Search</a></p>
+</footer>
+
+<script>
+const ALBUMS = {
+  classics: [
+    { artist: 'Pink Floyd', title: 'The Dark Side of the Moon', emoji: '🌙', query: 'Dark Side of the Moon Pink Floyd vinyl' },
+    { artist: 'The Beatles', title: 'Abbey Road', emoji: '🎸', query: 'Abbey Road Beatles vinyl' },
+    { artist: 'Fleetwood Mac', title: 'Rumours', emoji: '🌊', query: 'Rumours Fleetwood Mac vinyl' },
+    { artist: 'Michael Jackson', title: 'Thriller', emoji: '🕺', query: 'Thriller Michael Jackson vinyl' },
+    { artist: 'Led Zeppelin', title: 'Led Zeppelin IV', emoji: '⚡', query: 'Led Zeppelin IV vinyl' },
+    { artist: 'David Bowie', title: 'The Rise and Fall of Ziggy Stardust', emoji: '🌟', query: 'Ziggy Stardust David Bowie vinyl' },
+    { artist: 'The Velvet Underground', title: 'The Velvet Underground & Nico', emoji: '🍌', query: 'Velvet Underground Nico vinyl' },
+    { artist: 'Bob Dylan', title: 'Highway 61 Revisited', emoji: '🛣️', query: 'Highway 61 Revisited Bob Dylan vinyl' },
+  ],
+  rock: [
+    { artist: 'Radiohead', title: 'OK Computer', emoji: '💻', query: 'OK Computer Radiohead vinyl' },
+    { artist: 'Nirvana', title: 'Nevermind', emoji: '🏊', query: 'Nevermind Nirvana vinyl' },
+    { artist: 'The Strokes', title: 'Is This It', emoji: '🎵', query: 'Is This It The Strokes vinyl' },
+    { artist: 'Arctic Monkeys', title: 'Whatever People Say I Am…', emoji: '🐒', query: 'Arctic Monkeys Whatever People Say vinyl' },
+    { artist: 'Bruce Springsteen', title: 'Born to Run', emoji: '🏃', query: 'Born to Run Springsteen vinyl' },
+    { artist: 'Tom Waits', title: 'Rain Dogs', emoji: '🌧️', query: 'Rain Dogs Tom Waits vinyl' },
+    { artist: 'The Cure', title: 'Disintegration', emoji: '🕸️', query: 'Disintegration The Cure vinyl' },
+    { artist: 'R.E.M.', title: 'Automatic for the People', emoji: '🍂', query: 'Automatic for the People REM vinyl' },
+  ],
+  jazz: [
+    { artist: 'Miles Davis', title: 'Kind of Blue', emoji: '🎺', query: 'Kind of Blue Miles Davis vinyl' },
+    { artist: 'John Coltrane', title: 'A Love Supreme', emoji: '🙏', query: 'A Love Supreme John Coltrane vinyl' },
+    { artist: 'Dave Brubeck', title: 'Time Out', emoji: '⏱️', query: 'Time Out Dave Brubeck vinyl' },
+    { artist: 'Marvin Gaye', title: "What's Going On", emoji: '❤️', query: "What's Going On Marvin Gaye vinyl" },
+    { artist: 'Chet Baker', title: 'Chet Baker Sings', emoji: '🎤', query: 'Chet Baker Sings vinyl' },
+    { artist: "Bill Evans", title: 'Waltz for Debby', emoji: '🎹', query: 'Waltz for Debby Bill Evans vinyl' },
+    { artist: 'Nina Simone', title: "I Put a Spell on You", emoji: '✨', query: 'Nina Simone I Put a Spell on You vinyl' },
+    { artist: 'Charles Mingus', title: 'The Black Saint and the Sinner Lady', emoji: '🎷', query: 'Charles Mingus Black Saint Sinner Lady vinyl' },
+  ],
+  hiphop: [
+    { artist: 'Kendrick Lamar', title: 'To Pimp a Butterfly', emoji: '🦋', query: 'To Pimp a Butterfly Kendrick Lamar vinyl' },
+    { artist: 'Notorious B.I.G.', title: 'Ready to Die', emoji: '👑', query: 'Ready to Die Notorious BIG vinyl' },
+    { artist: 'Jay-Z', title: 'The Blueprint', emoji: '📐', query: 'The Blueprint Jay-Z vinyl' },
+    { artist: 'Outkast', title: 'Aquemini', emoji: '♊', query: 'Aquemini Outkast vinyl' },
+    { artist: 'A Tribe Called Quest', title: 'The Low End Theory', emoji: '🎶', query: 'Low End Theory A Tribe Called Quest vinyl' },
+    { artist: 'Wu-Tang Clan', title: 'Enter the Wu-Tang (36 Chambers)', emoji: '🐉', query: 'Enter the Wu-Tang 36 Chambers vinyl' },
+    { artist: 'Nas', title: 'Illmatic', emoji: '🗽', query: 'Illmatic Nas vinyl' },
+    { artist: 'Frank Ocean', title: 'Blonde', emoji: '🌊', query: 'Blonde Frank Ocean vinyl' },
+  ],
+};
+
+function renderGrid(gridId, albums) {
+  const grid = document.getElementById(gridId);
+  albums.forEach(album => {
+    const card = document.createElement('a');
+    card.className = 'album-card';
+    card.href = `/?q=${encodeURIComponent(album.query)}`;
+    card.innerHTML = `
+      <div class="album-art">${album.emoji}</div>
+      <div class="album-info">
+        <div class="album-artist">${album.artist}</div>
+        <div class="album-title">${album.title}</div>
+        <div class="album-cta">Compare prices →</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+renderGrid('classics-grid', ALBUMS.classics);
+renderGrid('rock-grid',     ALBUMS.rock);
+renderGrid('jazz-grid',     ALBUMS.jazz);
+renderGrid('hiphop-grid',   ALBUMS.hiphop);
+
+function handleSearch(e) {
+  e.preventDefault();
+  const q = document.getElementById('hero-search').value.trim();
+  if (q) window.location.href = `/?q=${encodeURIComponent(q)}`;
+}
+</script>
+
+</body>
+</html>
