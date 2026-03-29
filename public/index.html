@@ -497,6 +497,144 @@
       line-height: 1.5;
     }
 
+    /* ── Watch Price modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.18);
+      position: relative;
+      animation: modal-in 0.2s ease;
+    }
+    @keyframes modal-in {
+      from { opacity: 0; transform: translateY(12px) scale(0.97); }
+      to   { opacity: 1; transform: none; }
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 18px;
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: #aaa;
+      line-height: 1;
+    }
+    .modal-close:hover { color: #333; }
+    .modal-icon { font-size: 36px; margin-bottom: 10px; }
+    .modal h3 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+    }
+    .modal-item-title {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+    .modal-field {
+      margin-bottom: 14px;
+    }
+    .modal-field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 5px;
+    }
+    .modal-field input {
+      width: 100%;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .modal-field input:focus { border-color: #e63946; }
+    .modal-field .field-hint {
+      font-size: 12px;
+      color: #aaa;
+      margin-top: 4px;
+    }
+    .modal-submit {
+      width: 100%;
+      background: #e63946;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 4px;
+      transition: background 0.2s;
+    }
+    .modal-submit:hover { background: #c62828; }
+    .modal-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+    .modal-success {
+      text-align: center;
+      padding: 12px 0 4px;
+    }
+    .modal-success .success-icon { font-size: 48px; margin-bottom: 10px; }
+    .modal-success h3 { font-size: 18px; margin-bottom: 8px; color: #1a1a1a; }
+    .modal-success p  { font-size: 14px; color: #888; line-height: 1.5; }
+    .modal-error {
+      background: #fff5f5;
+      border: 1px solid #fcc;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #c0392b;
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    /* Watch button on cards */
+    .watch-btn {
+      background: none;
+      border: 1.5px solid #ddd;
+      border-radius: 10px;
+      padding: 9px 13px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #888;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .watch-btn:hover {
+      border-color: #e63946;
+      color: #e63946;
+      background: #fff5f5;
+    }
+    .watch-btn.watching {
+      border-color: #27ae60;
+      color: #27ae60;
+      background: #f0fff4;
+    }
+
     /* ── Footer ── */
     footer {
       text-align: center;
@@ -642,6 +780,34 @@
     <p style="margin-top:4px">Some links are affiliate links. We may earn a small commission if you buy — at no extra cost to you.</p>
     <p style="margin-top:6px"><a href="https://www.discogs.com" target="_blank">Discogs</a> · <a href="https://serpapi.com" target="_blank">Powered by SerpAPI</a></p>
   </footer>
+
+  <!-- Watch Price Modal -->
+  <div class="modal-overlay" id="watch-modal">
+    <div class="modal">
+      <button class="modal-close" id="modal-close" aria-label="Close">×</button>
+      <div id="modal-form-view">
+        <div class="modal-icon">🔔</div>
+        <h3>Watch this price</h3>
+        <p class="modal-item-title" id="modal-item-title"></p>
+        <div class="modal-error" id="modal-error"></div>
+        <div class="modal-field">
+          <label for="modal-email">Your email address</label>
+          <input type="email" id="modal-email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+        <div class="modal-field">
+          <label for="modal-target">Alert me when price drops below (optional)</label>
+          <input type="number" id="modal-target" placeholder="e.g. 25.00" min="0" step="0.01" />
+          <div class="field-hint">Leave blank to alert on any 10%+ price drop</div>
+        </div>
+        <button class="modal-submit" id="modal-submit">Set Price Alert</button>
+      </div>
+      <div class="modal-success" id="modal-success-view" style="display:none">
+        <div class="success-icon">✅</div>
+        <h3>Alert set!</h3>
+        <p>We'll email you when the price drops. Check your inbox for a confirmation.</p>
+      </div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
   <script>

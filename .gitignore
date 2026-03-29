@@ -7,6 +7,9 @@ node_modules/
 # Mac junk
 .DS_Store
 
+# SQLite database (Render uses a persistent disk; don't commit local data)
+data/
+
 # Logs
 *.log
 npm-debug.log*

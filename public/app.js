@@ -98,11 +98,22 @@ function renderResults(results) {
       </div>
       <div class="card-footer">
         ${priceHtml}
-        <a class="buy-btn" href="${escHtml(item.url)}" target="_blank" rel="noopener noreferrer">
-          View Deal →
-        </a>
+        <div style="display:flex;gap:7px;align-items:center;">
+          <button class="watch-btn" data-title="${escHtml(item.title)}" data-price="${item.priceRaw || ''}">
+            🔔
+          </button>
+          <a class="buy-btn" href="${escHtml(item.url)}" target="_blank" rel="noopener noreferrer">
+            View Deal →
+          </a>
+        </div>
       </div>
     `;
+
+    // Wire up the watch button
+    const watchBtn = card.querySelector('.watch-btn');
+    watchBtn.addEventListener('click', () => {
+      openWatchModal(item.title, item.priceRaw);
+    });
 
     grid.appendChild(card);
   });
@@ -202,3 +213,100 @@ function escHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+
+// ── Watch Price Modal ─────────────────────────────────────────
+
+const watchModal      = document.getElementById('watch-modal');
+const modalClose      = document.getElementById('modal-close');
+const modalItemTitle  = document.getElementById('modal-item-title');
+const modalEmail      = document.getElementById('modal-email');
+const modalTarget     = document.getElementById('modal-target');
+const modalSubmit     = document.getElementById('modal-submit');
+const modalError      = document.getElementById('modal-error');
+const modalFormView   = document.getElementById('modal-form-view');
+const modalSuccessView = document.getElementById('modal-success-view');
+
+let activeWatchTitle = '';
+let activeWatchPrice = null;
+
+function openWatchModal(title, price) {
+  activeWatchTitle = title;
+  activeWatchPrice = price;
+
+  // Reset to form view
+  modalFormView.style.display = '';
+  modalSuccessView.style.display = 'none';
+  modalError.style.display = 'none';
+  modalError.textContent = '';
+  modalItemTitle.textContent = title;
+  modalEmail.value = '';
+  modalTarget.value = price ? price.toFixed(2) : '';
+  modalSubmit.disabled = false;
+  modalSubmit.textContent = 'Set Price Alert';
+
+  watchModal.classList.add('open');
+  modalEmail.focus();
+}
+
+function closeWatchModal() {
+  watchModal.classList.remove('open');
+}
+
+modalClose.addEventListener('click', closeWatchModal);
+watchModal.addEventListener('click', e => {
+  if (e.target === watchModal) closeWatchModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeWatchModal();
+});
+
+modalSubmit.addEventListener('click', async () => {
+  const email  = modalEmail.value.trim();
+  const target = modalTarget.value ? parseFloat(modalTarget.value) : null;
+
+  modalError.style.display = 'none';
+
+  if (!email) {
+    modalError.textContent = 'Please enter your email address.';
+    modalError.style.display = 'block';
+    modalEmail.focus();
+    return;
+  }
+
+  modalSubmit.disabled = true;
+  modalSubmit.textContent = 'Saving…';
+
+  try {
+    const res = await fetch('/api/watchlist', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        email,
+        query:      input.value.trim(),
+        itemTitle:  activeWatchTitle,
+        alertBelow: target,
+        lastPrice:  activeWatchPrice,
+      }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      modalError.textContent = data.error || 'Something went wrong. Please try again.';
+      modalError.style.display = 'block';
+      modalSubmit.disabled = false;
+      modalSubmit.textContent = 'Set Price Alert';
+      return;
+    }
+
+    // Show success
+    modalFormView.style.display = 'none';
+    modalSuccessView.style.display = 'block';
+    setTimeout(closeWatchModal, 3000);
+
+  } catch (err) {
+    modalError.textContent = 'Could not connect. Please try again.';
+    modalError.style.display = 'block';
+    modalSubmit.disabled = false;
+    modalSubmit.textContent = 'Set Price Alert';
+  }
+});

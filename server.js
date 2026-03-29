@@ -4,8 +4,11 @@
 // ============================================================
 
 require('dotenv').config();
-const express = require('express');
-const axios   = require('axios');
+const express    = require('express');
+const axios      = require('axios');
+const nodemailer = require('nodemailer');
+const cron       = require('node-cron');
+const db         = require('./db');
 
 const app = express();
 app.use(express.static('public'));
@@ -201,6 +204,198 @@ app.get('/api/search', async (req, res) => {
     res.status(500).json({ error: 'Search failed. Please try again.' });
   }
 });
+
+// ── Email ─────────────────────────────────────────────────────
+
+function getTransporter() {
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) return null;
+  return nodemailer.createTransport({
+    host:   process.env.SMTP_HOST || 'smtp.gmail.com',
+    port:   parseInt(process.env.SMTP_PORT || '587'),
+    secure: false,
+    auth:   { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+  });
+}
+
+async function sendPriceAlert({ to, itemTitle, query, oldPrice, newPrice, buyUrl, unsubToken }) {
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.warn('Email not configured — skipping alert for', to);
+    return;
+  }
+  const siteUrl    = process.env.SITE_URL || 'https://vinyl-price-search.onrender.com';
+  const unsubUrl   = `${siteUrl}/unsubscribe?token=${unsubToken}`;
+  const searchUrl  = `${siteUrl}/?q=${encodeURIComponent(query)}`;
+  const savings    = oldPrice && newPrice ? (oldPrice - newPrice).toFixed(2) : null;
+  const priceLine  = newPrice ? `$${newPrice.toFixed(2)}` : 'a new low';
+  const savingLine = savings > 0 ? `<span style="color:#27ae60">You save $${savings}!</span>` : '';
+
+  const fromAddr = process.env.EMAIL_FROM || process.env.EMAIL_USER;
+  await transporter.sendMail({
+    from:    `"VinylPrice Alerts" <${fromAddr}>`,
+    to,
+    subject: `💰 Price drop: "${itemTitle}" is now ${priceLine}`,
+    html: `
+      <div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#fff;border-radius:12px;border:1px solid #eee;">
+        <div style="text-align:center;margin-bottom:24px;">
+          <span style="display:inline-block;background:#e63946;color:#fff;font-weight:800;font-size:18px;padding:8px 18px;border-radius:8px;">
+            🎵 VinylPrice
+          </span>
+        </div>
+        <h2 style="font-size:20px;color:#1a1a1a;margin-bottom:8px;">Price drop alert!</h2>
+        <p style="color:#555;font-size:15px;line-height:1.6;margin-bottom:20px;">
+          <strong>${itemTitle}</strong> just dropped to <strong style="color:#e63946;font-size:18px;">${priceLine}</strong>.
+          ${savingLine}
+        </p>
+        <div style="text-align:center;margin-bottom:24px;">
+          <a href="${buyUrl}" style="background:#e63946;color:#fff;text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:700;font-size:15px;display:inline-block;">
+            View Best Price →
+          </a>
+        </div>
+        <p style="text-align:center;margin-bottom:8px;">
+          <a href="${searchUrl}" style="color:#888;font-size:13px;">See all prices for "${query}"</a>
+        </p>
+        <hr style="border:none;border-top:1px solid #f0f0f0;margin:20px 0;">
+        <p style="color:#ccc;font-size:11px;text-align:center;">
+          You're receiving this because you set a price alert on VinylPrice.<br>
+          <a href="${unsubUrl}" style="color:#ccc;">Unsubscribe from this alert</a>
+        </p>
+      </div>
+    `,
+  });
+}
+
+// ── Watchlist Routes ──────────────────────────────────────────
+
+// POST /api/watchlist  — add a new price alert
+app.post('/api/watchlist', async (req, res) => {
+  const { email, query, itemTitle, alertBelow, lastPrice } = req.body;
+  if (!email || !query || !itemTitle) {
+    return res.status(400).json({ error: 'email, query, and itemTitle are required.' });
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ error: 'Please enter a valid email address.' });
+  }
+  try {
+    const { id, token } = db.addWatch({ email, query, itemTitle, alertBelow, lastPrice });
+
+    // Send confirmation email
+    const transporter = getTransporter();
+    if (transporter) {
+      const siteUrl = process.env.SITE_URL || 'https://vinyl-price-search.onrender.com';
+      const unsubUrl = `${siteUrl}/unsubscribe?token=${token}`;
+      const fromAddr = process.env.EMAIL_FROM || process.env.EMAIL_USER;
+      await transporter.sendMail({
+        from:    `"VinylPrice Alerts" <${fromAddr}>`,
+        to:      email,
+        subject: `✅ Price alert set for "${itemTitle}"`,
+        html: `
+          <div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#fff;border-radius:12px;border:1px solid #eee;">
+            <div style="text-align:center;margin-bottom:20px;">
+              <span style="background:#e63946;color:#fff;font-weight:800;font-size:18px;padding:8px 18px;border-radius:8px;display:inline-block;">🎵 VinylPrice</span>
+            </div>
+            <h2 style="font-size:18px;color:#1a1a1a;">Your price alert is set!</h2>
+            <p style="color:#555;font-size:14px;line-height:1.6;margin-top:10px;">
+              We'll email you at <strong>${email}</strong> when <strong>${itemTitle}</strong>
+              ${alertBelow ? `drops below <strong>$${parseFloat(alertBelow).toFixed(2)}</strong>` : 'drops in price'}.
+            </p>
+            <p style="color:#aaa;font-size:12px;margin-top:24px;text-align:center;">
+              <a href="${unsubUrl}" style="color:#aaa;">Cancel this alert</a>
+            </p>
+          </div>
+        `,
+      });
+    }
+
+    res.json({ ok: true, id });
+  } catch (err) {
+    console.error('Watchlist error:', err.message);
+    res.status(500).json({ error: 'Failed to save alert. Please try again.' });
+  }
+});
+
+// GET /unsubscribe?token=xxx  — one-click unsubscribe
+app.get('/unsubscribe', (req, res) => {
+  const { token } = req.query;
+  if (!token) return res.status(400).send('Invalid link.');
+  const removed = db.removeByToken(token);
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head><title>Unsubscribed — VinylPrice</title>
+    <style>body{font-family:sans-serif;text-align:center;padding:60px 20px;color:#555;}
+    a{color:#e63946;}</style></head>
+    <body>
+      <h2>${removed ? '✅ Alert removed' : 'Link already used'}</h2>
+      <p>${removed ? "You won't receive any more alerts for this record." : "This unsubscribe link has already been used."}</p>
+      <p><a href="/">← Back to VinylPrice</a></p>
+    </body>
+    </html>
+  `);
+});
+
+// ── Price Check Job ───────────────────────────────────────────
+
+async function runPriceChecks() {
+  const watches = db.getDueWatches();
+  if (watches.length === 0) return;
+  console.log(`[price-check] Checking ${watches.length} watchlist item(s)…`);
+
+  for (const watch of watches) {
+    try {
+      const [shopping, discogs] = await Promise.allSettled([
+        searchGoogleShopping(watch.query),
+        searchDiscogs(watch.query),
+      ]);
+      const all = [
+        ...(shopping.status === 'fulfilled' ? shopping.value : []),
+        ...(discogs.status  === 'fulfilled' ? discogs.value  : []),
+      ].filter(r => r.priceRaw !== null);
+
+      if (all.length === 0) { db.updateChecked(watch.id, watch.last_price); continue; }
+
+      all.sort((a, b) => a.priceRaw - b.priceRaw);
+      const bestPrice = all[0].priceRaw;
+      const bestUrl   = all[0].url;
+
+      db.updateChecked(watch.id, bestPrice);
+
+      // Decide whether to alert:
+      // a) user set a target price and we're now at or below it, OR
+      // b) no target set but price dropped 10%+ from when they set the alert
+      const shouldAlert =
+        (watch.alert_below !== null && bestPrice <= watch.alert_below) ||
+        (watch.alert_below === null && watch.last_price !== null && bestPrice <= watch.last_price * 0.9);
+
+      if (shouldAlert) {
+        console.log(`[price-check] Alert! ${watch.item_title}: $${bestPrice} (was $${watch.last_price})`);
+        await sendPriceAlert({
+          to:         watch.email,
+          itemTitle:  watch.item_title,
+          query:      watch.query,
+          oldPrice:   watch.last_price,
+          newPrice:   bestPrice,
+          buyUrl:     bestUrl,
+          unsubToken: watch.token,
+        });
+        db.markAlerted(watch.id);
+        db.updateChecked(watch.id, bestPrice);
+      }
+    } catch (err) {
+      console.error(`[price-check] Error checking "${watch.query}":`, err.message);
+    }
+  }
+}
+
+// Run price checks every day at 9 AM
+cron.schedule('0 9 * * *', () => {
+  console.log('[price-check] Daily job starting…');
+  runPriceChecks().catch(console.error);
+});
+
+// Also run once shortly after startup (catches up if server was sleeping)
+setTimeout(() => runPriceChecks().catch(console.error), 10000);
 
 // ── Start ─────────────────────────────────────────────────────
 
