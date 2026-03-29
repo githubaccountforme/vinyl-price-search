@@ -1,0 +1,12 @@
+# Secret keys — NEVER commit this
+.env
+
+# Dependencies (Render installs these automatically)
+node_modules/
+
+# Mac junk
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*

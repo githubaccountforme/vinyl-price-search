@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VinylPrice — Compare Record Prices Everywhere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0f0f0f;
+      color: #f0f0f0;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+      border-bottom: 1px solid #2a2a2a;
+      padding: 28px 24px 32px;
+      text-align: center;
+    }
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 48px; height: 48px;
+      background: #e63946;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      box-shadow: 0 0 0 3px #c62828, 0 0 0 10px rgba(230,57,70,0.15);
+      flex-shrink: 0;
+    }
+    .logo-icon::after {
+      content: '';
+      width: 12px; height: 12px;
+      background: #0f0f0f;
+      border-radius: 50%;
+      position: absolute;
+    }
+    .logo-inner-ring {
+      width: 32px; height: 32px;
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 50%;
+      position: absolute;
+    }
+    .logo-text h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+      text-align: left;
+    }
+    .logo-text h1 span { color: #e63946; }
+    .logo-text p {
+      font-size: 13px;
+      color: #888;
+      text-align: left;
+      margin-top: 2px;
+    }
+
+    /* ── Search Bar ── */
+    .search-section {
+      padding: 36px 24px 20px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .search-form {
+      display: flex;
+      gap: 10px;
+      background: #1e1e1e;
+      border: 1.5px solid #333;
+      border-radius: 16px;
+      padding: 6px 6px 6px 20px;
+      transition: border-color 0.2s;
+    }
+    .search-form:focus-within {
+      border-color: #e63946;
+      box-shadow: 0 0 0 4px rgba(230,57,70,0.12);
+    }
+    .search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      color: #f0f0f0;
+      font-family: inherit;
+    }
+    .search-input::placeholder { color: #555; }
+    .search-btn {
+      background: #e63946;
+      color: white;
+      border: none;
+      border-radius: 11px;
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .search-btn:hover  { background: #c62828; }
+    .search-btn:active { transform: scale(0.97); }
+    .search-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .search-hint {
+      font-size: 13px;
+      color: #555;
+      margin-top: 10px;
+      text-align: center;
+    }
+    .search-hint b { color: #888; font-weight: 500; }
+
+    /* ── Source Badges ── */
+    .sources-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      padding: 0 24px 28px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .source-chip {
+      background: #1e1e1e;
+      border: 1px solid #2a2a2a;
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 12px;
+      color: #777;
+      font-weight: 500;
+    }
+
+    /* ── Main Content ── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+    }
+
+    /* ── Status / Loading ── */
+    #status {
+      text-align: center;
+      padding: 48px 24px;
+      display: none;
+    }
+    .spinner {
+      width: 44px; height: 44px;
+      border: 3px solid #2a2a2a;
+      border-top-color: #e63946;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #status p { color: #777; font-size: 15px; }
+
+    /* ── Error ── */
+    #error-box {
+      background: #1e1212;
+      border: 1px solid #5c1b1b;
+      border-radius: 12px;
+      padding: 20px 24px;
+      color: #f88;
+      display: none;
+      margin-bottom: 24px;
+    }
+
+    /* ── Results Header ── */
+    #results-header {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    #results-header h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ccc;
+    }
+    #results-header h2 span { color: #fff; }
+    .sort-row { display: flex; align-items: center; gap: 8px; }
+    .sort-label { font-size: 13px; color: #666; }
+    .sort-select {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #ccc;
+      font-size: 13px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    /* ── Results Grid ── */
+    #results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      position: relative;
+    }
+    .card:hover {
+      border-color: #444;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .card.best-price {
+      border-color: #2d6a2f;
+      background: linear-gradient(180deg, #1a2a1a 0%, #1a1a1a 100%);
+    }
+
+    /* Badge */
+    .card-badge {
+      position: absolute;
+      top: 12px; left: 12px;
+      background: #2d6a2f;
+      color: #7fff7f;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    /* Image area */
+    .card-image {
+      width: 100%;
+      aspect-ratio: 1;
+      background: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      max-height: 200px;
+    }
+    .card-image img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .card-image .no-img {
+      width: 80px; height: 80px;
+      opacity: 0.12;
+    }
+
+    /* Card body */
+    .card-body {
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .retailer-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .retailer-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .retailer-name {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #888;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #ddd;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 2px;
+    }
+    .meta-chip {
+      background: #252525;
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      color: #666;
+    }
+
+    .card-footer {
+      padding: 0 16px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: auto;
+    }
+    .price {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+    .price.no-price {
+      font-size: 14px;
+      color: #666;
+      font-weight: 500;
+    }
+    .card.best-price .price { color: #7fff7f; }
+
+    .buy-btn {
+      background: #e63946;
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      display: inline-block;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .buy-btn:hover  { background: #c62828; }
+    .buy-btn:active { transform: scale(0.97); }
+
+    .rating {
+      font-size: 12px;
+      color: #f5a623;
+    }
+
+    /* ── Empty state ── */
+    #empty-state {
+      display: none;
+      text-align: center;
+      padding: 60px 24px;
+      color: #555;
+    }
+    #empty-state svg { opacity: 0.2; margin-bottom: 20px; }
+    #empty-state h3 { font-size: 20px; color: #666; margin-bottom: 8px; }
+    #empty-state p { font-size: 14px; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      border-top: 1px solid #1e1e1e;
+      color: #444;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+    footer a { color: #666; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .logo-text h1 { font-size: 22px; }
+      .search-btn span { display: none; }
+      #results-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="logo" href="/">
+      <div class="logo-icon">
+        <div class="logo-inner-ring"></div>
+      </div>
+      <div class="logo-text">
+        <h1>Vinyl<span>Price</span></h1>
+        <p>Compare record prices across the web — instantly</p>
+      </div>
+    </a>
+  </header>
+
+  <div class="search-section">
+    <form class="search-form" id="search-form">
+      <input
+        class="search-input"
+        id="search-input"
+        type="text"
+        placeholder='Try "Dark Side of the Moon" or "Kind of Blue"…'
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button class="search-btn" type="submit" id="search-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>Search</span>
+      </button>
+    </form>
+    <p class="search-hint">Search by <b>album name</b>, <b>artist</b>, or <b>catalog number</b></p>
+  </div>
+
+  <div class="sources-row">
+    <span class="source-chip">🛒 Amazon</span>
+    <span class="source-chip">🛍️ eBay</span>
+    <span class="source-chip">🎯 Target</span>
+    <span class="source-chip">🟡 Walmart</span>
+    <span class="source-chip">🎵 Discogs</span>
+    <span class="source-chip">🛒 Best Buy</span>
+    <span class="source-chip">+ more</span>
+  </div>
+
+  <main>
+    <div id="error-box"></div>
+
+    <div id="status">
+      <div class="spinner"></div>
+      <p id="status-text">Searching across retailers…</p>
+    </div>
+
+    <div id="results-header">
+      <h2>Results for "<span id="query-display"></span>"</h2>
+      <div class="sort-row">
+        <span class="sort-label">Sort by</span>
+        <select class="sort-select" id="sort-select">
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="source">Retailer</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="results-grid"></div>
+
+    <div id="empty-state">
+      <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+      <h3>No results found</h3>
+      <p>Try a different search — maybe just the album name or the artist.</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>VinylPrice searches across multiple retailers to help you find the best deal.</p>
+    <p style="margin-top:6px">Some links may be affiliate links — we may earn a small commission at no extra cost to you.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
