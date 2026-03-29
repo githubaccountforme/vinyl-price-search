@@ -205,24 +205,29 @@ app.get('/api/search', async (req, res) => {
   }
 });
 
-// ── Email ─────────────────────────────────────────────────────
+// ── Email (SendGrid HTTP API) ──────────────────────────────────
 
-function getTransporter() {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) return null;
-  return nodemailer.createTransport({
-    host:   process.env.SMTP_HOST || 'smtp.gmail.com',
-    port:   parseInt(process.env.SMTP_PORT || '587'),
-    secure: false,
-    auth:   { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+async function sendEmail({ to, subject, html }) {
+  const apiKey  = process.env.EMAIL_PASS;
+  const from    = process.env.EMAIL_FROM || process.env.EMAIL_USER;
+  if (!apiKey || !from) {
+    console.warn('[email] EMAIL_PASS or EMAIL_FROM not set — skipping');
+    return;
+  }
+  await axios.post('https://api.sendgrid.com/v3/mail/send', {
+    personalizations: [{ to: [{ email: to }] }],
+    from:             { email: from, name: 'VinylPrice Alerts' },
+    subject,
+    content:          [{ type: 'text/html', value: html }],
+  }, {
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
   });
 }
 
 async function sendPriceAlert({ to, itemTitle, query, oldPrice, newPrice, buyUrl, unsubToken }) {
-  const transporter = getTransporter();
-  if (!transporter) {
-    console.warn('Email not configured — skipping alert for', to);
-    return;
-  }
   const siteUrl    = process.env.SITE_URL || 'https://vinyl-price-search.onrender.com';
   const unsubUrl   = `${siteUrl}/unsubscribe?token=${unsubToken}`;
   const searchUrl  = `${siteUrl}/?q=${encodeURIComponent(query)}`;
@@ -230,9 +235,7 @@ async function sendPriceAlert({ to, itemTitle, query, oldPrice, newPrice, buyUrl
   const priceLine  = newPrice ? `$${newPrice.toFixed(2)}` : 'a new low';
   const savingLine = savings > 0 ? `<span style="color:#27ae60">You save $${savings}!</span>` : '';
 
-  const fromAddr = process.env.EMAIL_FROM || process.env.EMAIL_USER;
-  await transporter.sendMail({
-    from:    `"VinylPrice Alerts" <${fromAddr}>`,
+  await sendEmail({
     to,
     subject: `💰 Price drop: "${itemTitle}" is now ${priceLine}`,
     html: `
@@ -265,7 +268,7 @@ async function sendPriceAlert({ to, itemTitle, query, oldPrice, newPrice, buyUrl
   });
 }
 
-// ── Watchlist Routes ──────────────────────────────────────────
+// ── Watchlist Routes ─────────────────────────────────────────
 
 // POST /api/watchlist  — add a new price alert
 app.post('/api/watchlist', async (req, res) => {
@@ -284,32 +287,27 @@ app.post('/api/watchlist', async (req, res) => {
     res.json({ ok: true, id });
 
     // Send confirmation email in the background (non-blocking)
-    const transporter = getTransporter();
-    if (transporter) {
-      const siteUrl = process.env.SITE_URL || 'https://vinyl-price-search.onrender.com';
-      const unsubUrl = `${siteUrl}/unsubscribe?token=${token}`;
-      const fromAddr = process.env.EMAIL_FROM || process.env.EMAIL_USER;
-      transporter.sendMail({
-        from:    `"VinylPrice Alerts" <${fromAddr}>`,
-        to:      email,
-        subject: `✅ Price alert set for "${itemTitle}"`,
-        html: `
-          <div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#fff;border-radius:12px;border:1px solid #eee;">
-            <div style="text-align:center;margin-bottom:20px;">
-              <span style="background:#e63946;color:#fff;font-weight:800;font-size:18px;padding:8px 18px;border-radius:8px;display:inline-block;">🎵 VinylPrice</span>
-            </div>
-            <h2 style="font-size:18px;color:#1a1a1a;">Your price alert is set!</h2>
-            <p style="color:#555;font-size:14px;line-height:1.6;margin-top:10px;">
-              We'll email you at <strong>${email}</strong> when <strong>${itemTitle}</strong>
-              ${alertBelow ? `drops below <strong>$${parseFloat(alertBelow).toFixed(2)}</strong>` : 'drops in price'}.
-            </p>
-            <p style="color:#aaa;font-size:12px;margin-top:24px;text-align:center;">
-              <a href="${unsubUrl}" style="color:#aaa;">Cancel this alert</a>
-            </p>
+    const siteUrl  = process.env.SITE_URL || 'https://vinyl-price-search.onrender.com';
+    const unsubUrl = `${siteUrl}/unsubscribe?token=${token}`;
+    sendEmail({
+      to:      email,
+      subject: `✅ Price alert set for "${itemTitle}"`,
+      html: `
+        <div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#fff;border-radius:12px;border:1px solid #eee;">
+          <div style="text-align:center;margin-bottom:20px;">
+            <span style="background:#e63946;color:#fff;font-weight:800;font-size:18px;padding:8px 18px;border-radius:8px;display:inline-block;">🎵 VinylPrice</span>
           </div>
-        `,
-      }).catch(err => console.error('[email] Confirmation send failed:', err.message));
-    }
+          <h2 style="font-size:18px;color:#1a1a1a;">Your price alert is set!</h2>
+          <p style="color:#555;font-size:14px;line-height:1.6;margin-top:10px;">
+            We'll email you at <strong>${email}</strong> when <strong>${itemTitle}</strong>
+            ${alertBelow ? `drops below <strong>$${parseFloat(alertBelow).toFixed(2)}</strong>` : 'drops in price'}.
+          </p>
+          <p style="color:#aaa;font-size:12px;margin-top:24px;text-align:center;">
+            <a href="${unsubUrl}" style="color:#aaa;">Cancel this alert</a>
+          </p>
+        </div>
+      `,
+    }).catch(err => console.error('[email] Confirmation send failed:', err.message));
   } catch (err) {
     console.error('Watchlist error:', err.message);
     res.status(500).json({ error: 'Failed to save alert. Please try again.' });
