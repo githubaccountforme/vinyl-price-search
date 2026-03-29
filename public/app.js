@@ -15,6 +15,19 @@ const featureStrip = document.getElementById('feature-strip');
 
 let currentResults = [];
 
+// ── Affiliate link helper ────────────────────────────────────
+function affiliateUrl(url) {
+  if (!url) return url;
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes('amazon.')) {
+      u.searchParams.set('tag', 'miknew01-20');
+      return u.toString();
+    }
+  } catch (e) {}
+  return url;
+}
+
 // ── Retailer color map ───────────────────────────────────────
 const RETAILER_COLORS = {
   'Amazon':           '#FF9900',
@@ -102,7 +115,7 @@ function renderResults(results) {
           <button class="watch-btn" data-title="${escHtml(item.title)}" data-price="${item.priceRaw || ''}">
             🔔
           </button>
-          <a class="buy-btn" href="${escHtml(item.url)}" target="_blank" rel="noopener noreferrer">
+          <a class="buy-btn" href="${escHtml(affiliateUrl(item.url))}" target="_blank" rel="noopener noreferrer">
             View Deal →
           </a>
         </div>
